@@ -2,7 +2,7 @@
 import { css } from "@emotion/react";
 import * as S from "./style";
 import WideButton from "../../components/WideButton/WideButton";
-import { useEffect, useMemo, useRef } from "react";
+import { useRef } from "react";
 import { useState } from "react";
 
 /**
@@ -45,36 +45,11 @@ const imageLayout = css`
         width: 100%;
     }
 `;
-/**
- * 취소나 등록 후 같은 이미지 선택시 작동안함 => onChange 조건에 맞지 않아서인듯 -> value를 ""로 변경 작동하는듯 함
- * 중요도 낮음 => 이미지 있는 상태 + 첫번째 렌더링에서 confirm 창 발생 => jsx 파일 건드리는 경우외에 발생하지 않음
- */
+
 function PhotoRegister() {
     const uploadFilesId = useRef(0);
     const [ files, setFiles ] = useState([]);
-    const [ allFiles, setAllFiles ] = useState([]);
     const imgFileRef = useRef();
-    const notFirstLoad = useMemo(()=>{
-        return files.length > 0 ? true : false;
-    },[files])
-    useEffect(() => {
-        setAllFiles(!localStorage.getItem("photo") ? [] : JSON.parse(localStorage.getItem("photo")));
-    },[]);
-    useEffect(() => {
-        if(notFirstLoad) {
-            if(!window.confirm("저장하시겠습니까?")) {
-                setFiles([]);//페이지 로드로 안되게 설정. 취소시 저정되면 안됨
-                imgFileRef.current.value = "";
-                console.log(imgFileRef.current.value);
-                return;
-            } else {
-                localStorage.setItem("photo", JSON.stringify(allFiles));
-                imgFileRef.current.value = "";
-
-            } 
-        }
-    },[allFiles]);
-    
     
     const handleFileChange = (e) => {
         const loadFiles = Array.from(e.target.files);
@@ -82,28 +57,34 @@ function PhotoRegister() {
             imgFileRef.current.value = "";
             return;
         }
+        uploadFilesId.current = 0;
         let promises = [];
-        uploadFilesId.current = allFiles.length > 0 ? allFiles[allFiles.length - 1].id : 0;
         promises = loadFiles.map(file => new Promise((resolve) => {
             const fileReader = new FileReader();
             fileReader.onload = (e) => {
-                const loadImage = {
+                resolve({
                     id: uploadFilesId.current += 1,
                     imageUrl: e.target.result
-                };
-                resolve(loadImage);
+                });
             }
             fileReader.readAsDataURL(file);
         }));
+
         Promise.all(promises)
         .then(result => {
             setFiles(result);
-            setAllFiles([...allFiles, ...result]);
         });        
     }
 
+    const handleImageUpload = () => {
+        if(!window.confirm("저장하시겠습니까?")) {
+            return;
+        }
+        localStorage.setItem("photo", JSON.stringify(files));
+    }
     return (
         <div css={S.layout}>
+            <h1 css={S.title} onClick={handleImageUpload}>사진 등록하기</h1>
             <input type="file" style={{display: "none"}} multiple={true} ref={imgFileRef} onChange={handleFileChange}/>
             {files.length > 0 ?
                 <div css={layout}>
@@ -115,7 +96,7 @@ function PhotoRegister() {
                 </>
             )}
             </div> 
-            : <h1 css={S.title} >사진 등록하기</h1>
+            : null
         }
         <WideButton text={"사진 불러오기"} onClick={() => imgFileRef.current.click()}/>
         </div>

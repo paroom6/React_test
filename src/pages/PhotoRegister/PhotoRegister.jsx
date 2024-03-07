@@ -46,7 +46,6 @@ const imageLayout = css`
     }
 `;
 /**
- * 취소나 등록 후 같은 이미지 선택시 작동안함 => onChange 조건에 맞지 않아서인듯 -> value를 ""로 변경 작동하는듯 함
  * 중요도 낮음 => 이미지 있는 상태 + 첫번째 렌더링에서 confirm 창 발생 => jsx 파일 건드리는 경우외에 발생하지 않음
  */
 function PhotoRegister() {
@@ -64,7 +63,7 @@ function PhotoRegister() {
         if(notFirstLoad) {
             if(!window.confirm("저장하시겠습니까?")) {
                 setFiles([]);//페이지 로드로 안되게 설정. 취소시 저정되면 안됨
-                imgFileRef.current.value = "";
+                imgFileRef.current.value = "";//취소나 등록 후 같은 이미지 선택시 onChange 조건 재활성화
                 console.log(imgFileRef.current.value);
                 return;
             } else {
@@ -104,6 +103,7 @@ function PhotoRegister() {
 
     return (
         <div css={S.layout}>
+            {files.length > 0 ? <h1>등록된 사진</h1> : <h1 css={S.title} >사진 등록하기</h1>}
             <input type="file" style={{display: "none"}} multiple={true} ref={imgFileRef} onChange={handleFileChange}/>
             {files.length > 0 ?
                 <div css={layout}>
@@ -115,7 +115,7 @@ function PhotoRegister() {
                 </>
             )}
             </div> 
-            : <h1 css={S.title} >사진 등록하기</h1>
+            : null
         }
         <WideButton text={"사진 불러오기"} onClick={() => imgFileRef.current.click()}/>
         </div>

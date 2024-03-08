@@ -35,12 +35,13 @@ const imageLayout = css`
 
 function PhotoAlbum() {
     const [ files, setFiles ] = useState([]);
-    useEffect(() => {
+    useEffect(() => {//렌더링시 로컬스토리지에서 배열 받아서 출력
         setFiles(!localStorage.getItem("photo") ? [] : JSON.parse(localStorage.getItem("photo")));
     }, []);
 
     return (
         <div css={layout}>
+            {/* 삼항식 사용해서 로컬 스토리지 값에 따라 출력되는 html 변경*/}
             { files.length > 0 ? files?.map(file => 
                 <>
                     <div key={file.id} css={imageLayout}>

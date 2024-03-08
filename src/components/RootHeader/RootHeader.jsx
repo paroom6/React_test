@@ -4,8 +4,7 @@ import * as S from "./style";
 import defaultImg from "../../assets/images/profile/default.jpeg"
 import { useEffect } from "react";
 import { useState } from "react";
-let isChange = false;
-function RootHeader() {
+function RootHeader() {//기본 defaultImg 로컬스토리지 user의 이미지 존재한다면 대체
     const [ profileUrl, setProfileUrl ] = useState(defaultImg);
     useEffect(() =>{
         if(!!localStorage.getItem("user")){

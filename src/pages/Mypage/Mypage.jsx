@@ -4,7 +4,6 @@ import WideButton from "../../components/WideButton/WideButton";
 import { useInput } from "../../hooks/useInput";
 import * as S from "./style";
 import defaultProfile from "../../assets/images/profile/default.jpeg"
-import RootHeader from "../../components/RootHeader/RootHeader";
 
 
 
@@ -28,33 +27,33 @@ function Mypage(props) {
     const [ nameValue, handleNameOnChange, setNameValue] = useInput();
     const [ birthdayValue, handleBirthdayOnChange, setBirthdayValue ] = useInput();
     const [ profileUrl, setProfileUrl] = useState(defaultProfile);
-    const imgFileRef = useRef();
+    const imgFileRef = useRef();//input-file의 객체 지정용
 
     useEffect(() =>{
         if(!!localStorage.getItem("user")){
-            const loadUserInfo = JSON.parse(localStorage.getItem("user"));
+            const loadUserInfo = JSON.parse(localStorage.getItem("user"));//페이지 로딩시 로컬 스토리지에서 값 받음
             setProfileUrl(loadUserInfo.imgUrl);//onChange를 트리거로 값이 바뀌기에 useInput의 set을 가져와 사용
             setNicknameValue(loadUserInfo.nickname);
             setNameValue(loadUserInfo.name);
             setBirthdayValue(loadUserInfo.birthday);
         }
-    }, [])
+    },[])
 
     const imageChange = (e) => {
-        const file = Array.from(e.target.files)[0];
+        const file = Array.from(e.target.files)[0];//file Array를 일반 array로 변경 myPage의 경우 1개의 사진 파일만 업로드 되기에 0번 고정
         console.log(file);
-        if(e.target.files.length === 0) {
+        if(e.target.files.length === 0) {//입력 취소시 값을 받지 않고 리턴
             imgFileRef.current.value ="";
             return;
         }
-        const fileReader = new FileReader();
-        fileReader.onload = (e) => {
+        const fileReader = new FileReader(); //파일리더 객체 생성
+        fileReader.onload = (e) => {//결과값을 profileUrl에 저장
             setProfileUrl(e.target.result);
         };
-        fileReader.readAsDataURL(file);
+        fileReader.readAsDataURL(file);//파일 객체 url으로
         }
-        const handleSubmitOnClick = () => {
-            const userInfo = {
+        const handleSubmitOnClick = () => {//수정하기 버튼에 부여된 함수
+            const userInfo = {//로컬스토리지에 업로드할 객체 생성
                 nickname: nicknameValue,
                 name: nameValue,
                 birthday: birthdayValue,

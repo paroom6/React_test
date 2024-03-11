@@ -7,5 +7,5 @@ export function useInput() {
         setValue(() => e.target.value);
     }
 
-    return [ value, handleOnChange, setValue];
+    return [ value, handleOnChange, setValue ];
 }

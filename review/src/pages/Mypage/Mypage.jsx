@@ -4,7 +4,8 @@ import WideButton from "../../components/WideButton/WideButton";
 import { useInput } from "../../hooks/useInput";
 import * as S from "./style";
 import defaultProfile from "../../assets/images/profile/default.jpeg"
-
+import { useRecoilState } from 'recoil';
+import { MypageSubmitRefresh } from "../../atom/mypageSubmitRefresh.js";
 
 
 /**
@@ -28,14 +29,14 @@ function Mypage(props) {
     const [ birthdayValue, handleBirthdayOnChange, setBirthdayValue ] = useInput();
     const [ profileUrl, setProfileUrl] = useState(defaultProfile);
     const imgFileRef = useRef();//input-file의 객체 지정용
-
+    const [refresh, setRefresh] = useRecoilState(MypageSubmitRefresh);
     useEffect(() =>{
         if(!!localStorage.getItem("user")){
             const loadUserInfo = JSON.parse(localStorage.getItem("user"));//페이지 로딩시 로컬 스토리지에서 값 받음
-            setProfileUrl(loadUserInfo.imgUrl);//onChange를 트리거로 값이 바뀌기에 useInput의 set을 가져와 사용
-            setNicknameValue(loadUserInfo.nickname);
-            setNameValue(loadUserInfo.name);
-            setBirthdayValue(loadUserInfo.birthday);
+            setProfileUrl(() => loadUserInfo.imgUrl);//onChange를 트리거로 값이 바뀌기에 useInput의 set을 가져와 사용
+            setNicknameValue(() => loadUserInfo.nickname);
+            setNameValue(() => loadUserInfo.name);
+            setBirthdayValue(() => loadUserInfo.birthday);
         }
     },[])
 
@@ -60,8 +61,8 @@ function Mypage(props) {
                 imgUrl: profileUrl 
             }
             localStorage.setItem("user",JSON.stringify(userInfo));
-            alert("수정완료!!!");
-            window.location.reload(); // RootHeader의 경우 로컬스토리지의 변경을 인식하지 못하기에 일단 강제 새로고침으로 렌더링을 발생
+            alert("회원 정보를 수정하였습니다.");
+            setRefresh(() => true); // RootHeader의 경우 로컬스토리지의 변경을 인식하지 못하기에 일단 강제 새로고침으로 렌더링을 발생
         }
     return (
         <div css={S.layout}>
@@ -72,7 +73,7 @@ function Mypage(props) {
             <input css={S.inputBox} type="text" placeholder="닉네임" value={nicknameValue} onChange={handleNicknameOnChange} />
             <input css={S.inputBox} type="text" placeholder="이름" value={nameValue} onChange={handleNameOnChange} />
             <input css={S.inputBox} type="text" placeholder="생년월일" value={birthdayValue} onChange={handleBirthdayOnChange} />
-            <WideButton text={"수정하기"} onClick={handleSubmitOnClick}/>
+            <WideButton text={"완료"} onClick={handleSubmitOnClick}/>
         </div>
     );
 }
